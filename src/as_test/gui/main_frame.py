@@ -3,8 +3,8 @@ import wx
 class MainFrame(wx.Frame):
     def __init__(self):
         super().__init__(None, title="My wxPython App", size=(800, 600))
-        panel = wx.Panel(self)
-        wx.StaticText(panel, label="Hello from wxPython!", pos=(20, 20))
+        main_panel = wx.Panel(self)
+        wx.StaticText(main_panel, label="Hello from wxPython!", pos=(20, 20))
 
 
 
