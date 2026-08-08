@@ -1,5 +1,4 @@
 import wx
-from wx.core import EVT_BUTTON
 
 
 class MainFrame(wx.Frame):
