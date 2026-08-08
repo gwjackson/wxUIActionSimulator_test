@@ -2,6 +2,10 @@
 
 An attempt to learn the UIActionSimulator to creat / record macros
 
+https://docs.wxpython.org/wx.UIActionSimulator.html
+
+The UIActionSimulatory in the Demo file was just to simplified, though a good place to starte
+
 * Test against various widgets
 * Test against dialogs
 * Test w/serializing; load / save
