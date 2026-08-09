@@ -56,6 +56,12 @@ class MainFrame(wx.Frame):
         self.dlg_sizer.Add(self.dlg_button, 0, wx.ALL, 5)
         self.fgs_main.Add(self.dlg_sizer)
 
+        # add multiline text control
+        self.tc_sizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.mult_line_tx = wx.TextCtrl(self.main_panel, -1, style=wx.TE_MULTILINE)
+        self.tc_sizer.Add(self.mult_line_tx, 0, wx.ALL, 5)
+        self.fgs_main.Add(self.tc_sizer)
+
         # set flexgrid
         self.main_panel.SetSizer(self.fgs_main)
         self.main_panel.Layout()
