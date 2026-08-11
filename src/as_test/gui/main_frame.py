@@ -1,5 +1,9 @@
 import wx
 
+#from gui.as_menus import File_menu
+from core.macro_widget import on_record
+
+
 
 class MainFrame(wx.Frame):
     def __init__(self):
@@ -61,6 +65,22 @@ class MainFrame(wx.Frame):
         self.mult_line_tx = wx.TextCtrl(self.main_panel, -1, style=wx.TE_MULTILINE)
         self.tc_sizer.Add(self.mult_line_tx, 0, wx.ALL, 5)
         self.fgs_main.Add(self.tc_sizer)
+
+        # add record/recording, playback buttons
+        self.butn_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.record_btn = wx.Button(self.main_panel, -1, label="🔴 Record Macro")
+        self.record_btn.SetToolTip(
+            "Click this button and then type, click, mouse around\n"
+            "to record your macro. Then click here again when done.")
+        # Bind the external handler use a lambda function to pass the widget to the external routine(s)
+        # this passes both the widget and the event
+        # linking the record and playback buttons so can pass both in the lambda function
+        self.record_btn.Bind(wx.EVT_BUTTON, lambda evt: on_record(self.record_btn, self.playback_btn, evt))
+        self.butn_sizer.Add(self.record_btn, 0, wx.ALL, 5)
+        self.playback_btn = wx.Button(self.main_panel, -1, label="▶ Play Macro")
+        self.playback_btn.SetToolTip("After recording click here to replay your macro")
+        self.butn_sizer.Add(self.playback_btn, 0, wx.ALL, 5)
+        self.fgs_main.Add(self.butn_sizer)
 
         # set flexgrid
         self.main_panel.SetSizer(self.fgs_main)
