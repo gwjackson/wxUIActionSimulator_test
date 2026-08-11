@@ -1,6 +1,6 @@
 import wx
-from src.as_test.gui.main_frame import MainFrame
-from src.as_test.gui.as_menus import File_menu
+from gui.main_frame import MainFrame
+from gui.as_menus import File_menu
 
 def main():
     """
