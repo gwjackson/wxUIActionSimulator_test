@@ -1,7 +1,7 @@
 import wx
 
-#from gui.as_menus import File_menu
 from core.macro_widget import on_record
+
 
 
 
@@ -86,8 +86,33 @@ class MainFrame(wx.Frame):
         self.main_panel.SetSizer(self.fgs_main)
         self.main_panel.Layout()
 
+        # I refactor the menu here? is part of this GUI
+        ####################
+        # this frames menu
+        ####################
+
+        self.menu_bar = wx.MenuBar()
+
+        self.file_menu = wx.Menu()
+        self.file_menu.Append(wx.ID_ANY, "&Open Macros\tCtrl+N", "Open Macro files")
+        self.file_menu.Append(wx.ID_ANY, "&Save Macros\tCtrl+N", "Save Macro files")
+        self.file_menu.AppendSeparator()
+        self.file_menu.Append(wx.ID_EXIT, "E&xit\tAlt+F4", "Exit")
+        self.menu_bar.Append(self.file_menu, "&File")
+
+        self.help_menu = wx.Menu()
+        self.help_menu.Append(wx.ID_ANY, "&Help")
+        self.menu_bar.Append(self.help_menu, "&Help")
+
+        self.macro_menu = wx.Menu()
+        self.macro_menu.Append(wx.ID_ANY, "&Macro Options")
+        self.menu_bar.Append(self.macro_menu, "&Macro")
+
+        self.SetMenuBar(self.menu_bar)
+
+
     # basic event handling;
-    def on_dlg_button(self, evt):
+    def on_dlg_button(self, evt):               # ?? refactor into the macro_widgets??
         # Wildcard string matching all files
         wildcard = "All files (*.*)|*.*"
 
@@ -107,12 +132,13 @@ class MainFrame(wx.Frame):
             print(file_dialog.GetPath())
 
 
-
+"""
 def main():
     app = wx.App(False)
     frame = MainFrame()
     frame.Show()
     app.MainLoop()
+"""
 
 if __name__ == "__main__":
     main()
