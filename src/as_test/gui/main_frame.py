@@ -1,6 +1,7 @@
 import wx
 
-from core.macro_widget import on_record
+
+import as_test.core.macro_widget
 
 
 
@@ -55,8 +56,12 @@ class MainFrame(wx.Frame):
 
         # row 2, col 2;  predefined dialog
         self.dlg_sizer = wx.BoxSizer(wx.HORIZONTAL)
+
         self.dlg_button = wx.Button(self.main_panel, -1, label="File Dialog")
-        self.dlg_button.Bind(wx.EVT_BUTTON, self.on_dlg_button)
+        #self.dlg_button.Bind(wx.EVT_BUTTON, self.on_dlg_button)
+        self.Bind(wx.EVT_BUTTON,
+                  lambda evt: as_test.core.macro_widget.on_dlg_button(self.dlg_button, evt),
+                  id=self.dlg_button.GetId())
         self.dlg_sizer.Add(self.dlg_button, 0, wx.ALL, 5)
         self.fgs_main.Add(self.dlg_sizer)
 
@@ -75,7 +80,7 @@ class MainFrame(wx.Frame):
         # Bind the external handler use a lambda function to pass the widget to the external routine(s)
         # this passes both the widget and the event
         # linking the record and playback buttons so can pass both in the lambda function
-        self.record_btn.Bind(wx.EVT_BUTTON, lambda evt: on_record(self.record_btn, self.playback_btn, evt))
+        self.record_btn.Bind(wx.EVT_BUTTON, lambda evt: as_test.core.macro_widget.on_record(self.record_btn, self.playback_btn, evt))
         self.butn_sizer.Add(self.record_btn, 0, wx.ALL, 5)
         self.playback_btn = wx.Button(self.main_panel, -1, label="▶ Play Macro")
         self.playback_btn.SetToolTip("After recording click here to replay your macro")
@@ -87,17 +92,33 @@ class MainFrame(wx.Frame):
         self.main_panel.Layout()
 
         # I refactor the menu here? is part of this GUI
-        ####################
+        #################################################
         # this frames menu
-        ####################
+        #################################################
 
         self.menu_bar = wx.MenuBar()
 
         self.file_menu = wx.Menu()
-        self.file_menu.Append(wx.ID_ANY, "&Open Macros\tCtrl+N", "Open Macro files")
-        self.file_menu.Append(wx.ID_ANY, "&Save Macros\tCtrl+N", "Save Macro files")
+
+        self.item_file_open = self.file_menu.Append(wx.ID_ANY, "&Open Macros\tCtrl+N", "Open Macro files")
+        # using lambda to pass args self.item_file_open, and the event - evt
+        # but the item ID is not part of the lambda but part of the binding
+        self.Bind(wx.EVT_MENU,
+                  lambda evt: as_test.core.macro_widget.on_file_open_macors(self.item_file_open, evt),
+                  id=self.item_file_open.GetId())
+
+        self.item_file_save = self.file_menu.Append(wx.ID_ANY, "&Save Macros\tCtrl+M", "Save Macro files")
+        self.Bind(wx.EVT_MENU,
+                  lambda evt: as_test.core.macro_widget.on_file_save_macors(self.item_file_save, evt),
+                  id=self.item_file_save.GetId())
+
         self.file_menu.AppendSeparator()
-        self.file_menu.Append(wx.ID_EXIT, "E&xit\tAlt+F4", "Exit")
+
+        self.item_file_close = self.file_menu.Append(wx.ID_EXIT, "E&xit\tCtrl+Q", "Exit")
+        self.Bind(wx.EVT_MENU,
+                  lambda evt: as_test.core.macro_widget.on_exit(self.item_file_close, evt),
+                  id=self.item_file_close.GetId())
+
         self.menu_bar.Append(self.file_menu, "&File")
 
         self.help_menu = wx.Menu()
@@ -112,33 +133,14 @@ class MainFrame(wx.Frame):
 
 
     # basic event handling;
-    def on_dlg_button(self, evt):               # ?? refactor into the macro_widgets??
-        # Wildcard string matching all files
-        wildcard = "All files (*.*)|*.*"
 
-        with wx.FileDialog(
-                parent=self.main_panel,
-                message="Select a file",
-                defaultDir="",
-                defaultFile="",
-                wildcard=wildcard,
-                style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST ) as file_dialog:
-            # Show the dialog modally
-            if file_dialog.ShowModal() == wx.ID_CANCEL:
-                return None  # User canceled
-
-            # Return the selected file path
-            #return file_dialog.GetPath()
-            print(file_dialog.GetPath())
-
-
-"""
 def main():
     app = wx.App(False)
     frame = MainFrame()
+    frame.Fit()
     frame.Show()
     app.MainLoop()
-"""
+
 
 if __name__ == "__main__":
     main()
