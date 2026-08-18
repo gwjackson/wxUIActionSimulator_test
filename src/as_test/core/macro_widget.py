@@ -41,8 +41,46 @@ def _start_record_macro(recording):
         print("recording")
         pass
 
+# ------------------------------------------------
+# Menu selections
+# ________________________________________________
+def on_file_open_macors(self, evt):
+    print("File Open menu selected Ctrl+N")
 
-"""
+def on_file_save_macors(self, evt):
+    print("File Save menu selected Ctrl+M")
+
+def on_exit(self, evt):
+    print(f"Exit menu selected Ctrl+Q")
+    wx.GetApp().ExitMainLoop()
+
+
+# --------------------------------------------------
+# dialog call
+# ---------------------------------------------------
+
+def on_dlg_button(self, evt):
+    # Wildcard string matching all files
+    wildcard = "All files (*.*)|*.*"
+
+    with wx.FileDialog(
+            #parent=self.main_panel,
+            parent = None,
+            message="Select a file",
+            defaultDir="",
+            defaultFile="",
+            wildcard=wildcard,
+            style=wx.FD_OPEN | wx.FD_FILE_MUST_EXIST ) as file_dialog:
+        # Show the dialog modally
+        if file_dialog.ShowModal() == wx.ID_CANCEL:
+            return None  # User canceled
+
+        # Return the selected file path
+        #return file_dialog.GetPath()
+        print(file_dialog.GetPath())
+
+""" 
+    some items that the event object has you can query 
     if evt:
         obj = evt.GetEventObject()
         print("Widget:", obj)
