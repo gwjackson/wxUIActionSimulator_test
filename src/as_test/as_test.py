@@ -1,23 +1,17 @@
 import wx
+from MyApp import MyApp
 from gui.main_frame import MainFrame
-from gui.as_menus import File_menu
 
-def main():
-    """
-    This is the main function and will call the GUI, Utilities, Core functions etc.
-    :return: None
-    """
+
+#def main():
+"""
+This is the main launcher for the Application and will call the GUI, Utilities, Core functions etc.
+"""
+
+
+if __name__ == "__main__":
     app = wx.App(False)
     frame = MainFrame()
-
-
-    # Instantiate and assign the imported menu bar
-    menu_bar = File_menu(MainFrame)
-    frame.SetMenuBar(menu_bar)
-
     frame.Fit()
     frame.Show()
     app.MainLoop()
-
-if __name__ == "__main__":
-    main()
