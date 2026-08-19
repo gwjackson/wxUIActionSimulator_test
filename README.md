@@ -3,10 +3,15 @@
 An attempt to learn the UIActionSimulator to creat / record macros
 
 UIAction stuff
+
 https://docs.wxpython.org/wx.UIActionSimulator.html
+
 Accelerator stuff
-https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntry.html
+
+\https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntry.html
+
 and baried deep in the wx.Window page is the HotKey stuff
+
 https://wxpython.org/Phoenix/docs/html/wx.Window.html#wx.Window.RegisterHotKey
 
 The UIActionSimulatory in the Demo file was just to simplified, though a good place to starte
