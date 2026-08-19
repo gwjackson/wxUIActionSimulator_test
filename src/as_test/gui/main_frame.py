@@ -1,6 +1,5 @@
 import wx
 
-
 import as_test.core.macro_widget
 
 
@@ -10,7 +9,9 @@ class MainFrame(wx.Frame):
     def __init__(self):
         super().__init__(None, title="My wxPython App", size=(800, 600))
         self.main_panel = wx.Panel(self)
-        #wx.StaticText(main_panel, label="Hello from wxPython!", pos=(20, 20))
+
+
+
 
         ##########
         # build the main flexgridsizer - keep it simpel
@@ -48,7 +49,7 @@ class MainFrame(wx.Frame):
 
         # row2, col 1 wx.CombBox
         self.cbobx_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.cbob1 = wx.ComboBox(self.main_panel, -1)
+        self.cbob1 = wx.ComboBox(self.main_panel, -1, style=wx.CB_READONLY)
         self.cbob1.AppendItems(["Really First","Option 1", "The Other", "Something else"])
         self.cbob1.SetSelection(0)
         self.cbobx_sizer.Add(self.cbob1, 0, wx.ALL, 5)
@@ -58,7 +59,6 @@ class MainFrame(wx.Frame):
         self.dlg_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.dlg_button = wx.Button(self.main_panel, -1, label="File Dialog")
-        #self.dlg_button.Bind(wx.EVT_BUTTON, self.on_dlg_button)
         self.Bind(wx.EVT_BUTTON,
                   lambda evt: as_test.core.macro_widget.on_dlg_button(self.dlg_button, evt),
                   id=self.dlg_button.GetId())
@@ -68,6 +68,8 @@ class MainFrame(wx.Frame):
         # add multiline text control
         self.tc_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mult_line_tx = wx.TextCtrl(self.main_panel, -1, style=wx.TE_MULTILINE)
+        self.mult_line_tx.SetToolTip("Tab or click any other control to enter text")
+        self.mult_line_tx.Bind(wx.EVT_KILL_FOCUS, self.on_txtctrl_lost_focus)
         self.tc_sizer.Add(self.mult_line_tx, 0, wx.ALL, 5)
         self.fgs_main.Add(self.tc_sizer)
 
@@ -90,6 +92,20 @@ class MainFrame(wx.Frame):
         # set flexgrid
         self.main_panel.SetSizer(self.fgs_main)
         self.main_panel.Layout()
+
+        # ---------------------------------------------------
+        # Build the accelerator table
+        # ---------------------------------------------------
+        # create linking ID's for the wx.EVT_MENU to the accelerator in the table
+        ID_ALT_W =wx.NewId()
+
+        self.Bind(wx.EVT_MENU, self.on_txtctrl_lost_focus, id=ID_ALT_W)
+
+        self.accel_table = wx.AcceleratorTable([(wx.ACCEL_ALT, ord('W'), ID_ALT_W),])
+
+        self.SetAcceleratorTable(self.accel_table)
+
+
 
         # I refactor the menu here? is part of this GUI
         #################################################
@@ -133,6 +149,11 @@ class MainFrame(wx.Frame):
 
 
     # basic event handling;
+
+    def on_txtctrl_lost_focus(self,evt):
+        print("lost focus text is ->", self.mult_line_tx.GetValue())
+        # need the skip to allow the lost focus event to propagate normally
+        evt.Skip()
 
 def main():
     app = wx.App(False)
