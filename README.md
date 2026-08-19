@@ -9,8 +9,10 @@ https://docs.wxpython.org/wx.UIActionSimulator.html
 Accelerator stuff
 
 \https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntry.html
+https://blog.pythonlibrary.org/2017/09/28/wxpython-all-about-accelerators 
+has several good articles as well (not that the wxPython docs are great :-( )
 
-and baried deep in the wx.Window page is the HotKey stuff
+and buried deep in the wx.Window page is the HotKey stuff
 
 https://wxpython.org/Phoenix/docs/html/wx.Window.html#wx.Window.RegisterHotKey
 
@@ -23,6 +25,7 @@ The UIActionSimulatory in the Demo file was just to simplified, though a good pl
 * effect on screen size / resolution / location
 * Still working on project layout and packaging
 * and distribution options 
+* Hotkeys 
 
 8/5/16Initial commit  ~ 
 8/19/26 multiple commits trying to roll my own hotkey system - complete waste of time

@@ -69,6 +69,7 @@ class MainFrame(wx.Frame):
         self.tc_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mult_line_tx = wx.TextCtrl(self.main_panel, -1, style=wx.TE_MULTILINE)
         self.mult_line_tx.SetToolTip("Tab or click any other control to enter text")
+        # this lambda lets me package the widget and the event into the handler call
         self.mult_line_tx.Bind(wx.EVT_KILL_FOCUS,
                                lambda evt: as_test.core.macro_widget.on_txtctrl_lost_focus(self.mult_line_tx, evt))
         self.tc_sizer.Add(self.mult_line_tx, 0, wx.ALL, 5)
