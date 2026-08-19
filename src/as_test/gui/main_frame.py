@@ -69,7 +69,8 @@ class MainFrame(wx.Frame):
         self.tc_sizer = wx.BoxSizer(wx.HORIZONTAL)
         self.mult_line_tx = wx.TextCtrl(self.main_panel, -1, style=wx.TE_MULTILINE)
         self.mult_line_tx.SetToolTip("Tab or click any other control to enter text")
-        self.mult_line_tx.Bind(wx.EVT_KILL_FOCUS, self.on_txtctrl_lost_focus)
+        self.mult_line_tx.Bind(wx.EVT_KILL_FOCUS,
+                               lambda evt: as_test.core.macro_widget.on_txtctrl_lost_focus(self.mult_line_tx, evt))
         self.tc_sizer.Add(self.mult_line_tx, 0, wx.ALL, 5)
         self.fgs_main.Add(self.tc_sizer)
 
@@ -97,9 +98,14 @@ class MainFrame(wx.Frame):
         # Build the accelerator table
         # ---------------------------------------------------
         # create linking ID's for the wx.EVT_MENU to the accelerator in the table
-        ID_ALT_W =wx.NewId()
+        # here again using lambda functions to load the call to the handlers in macro_widget.py
+        # this passes in the handler in macro_widget; the control and the evt as well
 
-        self.Bind(wx.EVT_MENU, self.on_txtctrl_lost_focus, id=ID_ALT_W)
+        ID_ALT_W =wx.NewIdRef()
+
+        self.Bind(wx.EVT_MENU,
+                  lambda evt: as_test.core.macro_widget.on_txtctrl_lost_focus(self.mult_line_tx, evt),
+                  id=ID_ALT_W)
 
         self.accel_table = wx.AcceleratorTable([(wx.ACCEL_ALT, ord('W'), ID_ALT_W),])
 
@@ -149,11 +155,12 @@ class MainFrame(wx.Frame):
 
 
     # basic event handling;
+    """
+    moving all to the macro_widget.py after testing here
+    -
+    this is just to be GUI while macro_widget will have all the business stuff
+    """
 
-    def on_txtctrl_lost_focus(self,evt):
-        print("lost focus text is ->", self.mult_line_tx.GetValue())
-        # need the skip to allow the lost focus event to propagate normally
-        evt.Skip()
 
 def main():
     app = wx.App(False)

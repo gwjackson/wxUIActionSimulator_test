@@ -54,6 +54,12 @@ def on_exit(self, evt):
     print(f"Exit menu selected Ctrl+Q")
     wx.GetApp().ExitMainLoop()
 
+def on_txtctrl_lost_focus( widget,evt=None):
+    text = widget.GetValue()
+    print("lost focus text is ->", text)
+    # need the skip to allow the lost focus event to propagate normally
+    evt.Skip()
+
 
 # --------------------------------------------------
 # dialog call
@@ -78,6 +84,9 @@ def on_dlg_button(self, evt):
         # Return the selected file path
         #return file_dialog.GetPath()
         print(file_dialog.GetPath())
+
+
+
 
 """ 
     some items that the event object has you can query 
