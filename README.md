@@ -14,6 +14,11 @@ The UIActionSimulatory in the Demo file was just to simplified, though a good pl
 * Still working on project layout and packaging
 * and distribution options 
 
+8/5/16Initial commit  ~ 
+8/19/26 multiple commits trying to roll my own hotkey system - complete waste of time
+8/19/26 used the wxPython Hotkey and Accelerator table much easier.
+
+
 
 Dependencies:
 * Python >= 3.13.x
