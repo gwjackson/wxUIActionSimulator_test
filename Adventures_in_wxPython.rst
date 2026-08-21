@@ -16,15 +16,15 @@ the hotkeys I wanted
 
 HotKeys / Accelerator table
 ---------------------------
-Some useful links
-
+Some useful links: wxPython docs
 
 https://wxpython.org/Phoenix/docs/html/wx.AcceleratorEntry.html
 
-Mouse vs Python
+Mouse vs Python (this is one of several examples)
+
 https://blog.pythonlibrary.org/2017/09/28/wxpython-all-about-accelerators
 
-Menus create EVT_MENU events, and if in there creating you inclide a \tAlt+W,
+Menus create EVT_MENU events, and if in there creation you inclide a '\tAlt+W',
 it also creates a HotKey to trigger the menu item directly.
 
 Other widgets to not fire an EVT_MENU; however, it is possible to connect a EVT_MENU
@@ -72,10 +72,42 @@ and "⏹ Stop Recording"
 Line 2 creates the linking reference ID used for the hotkey link in line 4
 and the table entry in line 5.  Here the lambda passes two objects the record and play back buttons.
 The handler for the record botton toggles itself as above but also disables the play
-playback button while macor recording is in progress, anb enables when the recording is stopped.
+playback button while macro recording is in progress, anb enables when the recording is stopped.
 
 So allowing the hotkey 'Alt+M' to do the same.
 
+Line 6 you have to SetAcceleratorTable(self.accel_table) to make it active.
+
 The lambda technique of passing multiple arguments to the widget's event
 handler was taught to me via the CoPilot AI
+
+
+Command / CommandProcessor
+----------------------------------
+
+This is a VERY poorly documented yet very powerful part of wxPython.
+
+To create a macro w/Command - CommandProcess there are several steps
+
+You need to create a subclass a Command for each of the widgets you wish to
+make into a macro command. You must override to functions 'Do' and 'Undo', and
+you should save the original state and the new state created by the user
+
+you must have the widget that you made the command - call that command as part
+of it's handler function.  These functions will use the new / old states.
+
+Each widget handler i.e. on_click() but do several things
+- must perform the business logic it was created for
+
+- must capture the widgets final state (for the Command object) this is the new state
+
+- is must call the wx.commandprocessor and store itself in the command list
+
+- there is a lot of boiler code each handler must have and is best to
+  create a decorator to be used for each widgets handler
+
+
+
+
+
 
