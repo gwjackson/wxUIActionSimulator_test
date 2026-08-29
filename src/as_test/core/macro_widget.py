@@ -2,6 +2,21 @@ import wx
 import time
 import functools
 
+# module level state class
+class _State:
+    last_record_btn = None
+    last_playback_btn = None
+    last_event = None
+    last_contest = None
+
+    def reset_state(self):
+        state.last_record_btn = None
+        state.last_playback_btn = None
+        state.last_event = None
+        state.last_context = None
+
+state = _State()
+
 
 
 class UI_Simulator(wx.UIActionSimulator):
@@ -15,7 +30,7 @@ class UI_Simulator(wx.UIActionSimulator):
 
 # this needs to be moved down to the new Macro class
 # MacroManager to be in that class
-def on_record(record, playback, evt=None):
+def on_record(record, play, evt=None):
     """
     use a lamda function in the .Bind
     # Bind the external handler
@@ -26,18 +41,39 @@ def on_record(record, playback, evt=None):
     build the macro list of moves / clicks / chars / etc.
     :return:
     """
+    state.last_play_btn = play
+    state.last_record_btn = record
+
     macros = MacroManager()
 
     if record.GetLabel() == "🔴 Record Macro":
         record.SetLabel("⏹ Stop Recording")
-        playback.Disable()
+        play.Disable()
         start_time = time.time()
         macros.start_recording()
     else:
         record.SetLabel("🔴 Record Macro")
-        playback.Enable()
+        play.Enable()
         macros.stop_recording("Test Macro")
         return
+
+def on_play(record, play,  evt=None):
+    state.last_play_btn = play
+    state.last_record_btn = record
+    macros = MacroManager()
+
+    if play.GetLabel() == "Play Macro":
+        play.SetLabel("Playing Macro")
+        record.Disable()
+        print("Playing Macro")
+        #macros.apply_macro(self.macro_name)
+    else:
+        play.SetLabel("Play Macro")
+        record.Enable()
+        print("stop Playing Macro")
+    return
+
+
 
 # ------------------------------------------------
 # Menu selections
@@ -80,8 +116,8 @@ def on_dlg_button(self, evt):
             return None  # User canceled
 
         # Return the selected file path
-        #return file_dialog.GetPath()
         print(file_dialog.GetPath())
+        return file_dialog.GetPath()
 
 
 
@@ -142,15 +178,18 @@ class MacroManager:
     # --------------------------------
     # Recording control
     # --------------------------------
-    def start_recording(self):                                            # toggle record macro / stop recording: to have to refractor this from above
+    def start_recording(self):                       # toggle record macro / stop recording: to have to refractor this from above
+        self.macro_Name = "test_macro"               # need to get user input for macro name
         self.recording = True
         self.record_buffer.clear()
         print("Macro started recording")
+        # add call macro recorder to actually get it started
 
     def stop_recording(self, macro_name):
         self.recording = False
         self.user_macros[macro_name] = list(self.record_buffer)
         print("Macro stopper recording")
+        # call on_record to toggle off
 
 
     # -----------------------------------------
@@ -162,10 +201,10 @@ class MacroManager:
     2. has to capture is initial state
     3  had to capture is final state (this is for the Do / Undo function of command)
     4. append its self on to the record_buffer
-    Now that is a lot of boiler plate for every widget -- > so a decorature just makes sense
+    Now that is a lot of boiler plate for every widget -- > so a decorator just makes sense
     And you need to only decorate user generated events that you want to record, not all your widgets
     For instance you do not what to record the 'Record', 'Stop Recording', 'Playback' buttons you 
-    would create a crazy loop and cause a tear in the space-time continum 
+    would create a crazy loop and cause a tear in the space-time continuum 
     """
     def recoradable(self, widget_getter):
         def decorator(func):
@@ -191,13 +230,14 @@ class MacroManager:
     # ----------------------------------------
     # Replay macro
     # ________________________________________
-    def apply_macro(selfself, macro_name):
+    def apply_macro(self, macro_name):
         actions = self.user_macros.get(macro_name)
         if not actions:
             return
 
         cmd = CompositeMacroCommand(actions, label=f'Macro: {macro_name}')
         self.processor.Submit(cmd)
+        # call on_play to toggle off
 
     # ---------------------------------------------
     # Undo / Redo  (not sure will be using but is part of Command / CommandProcessor
