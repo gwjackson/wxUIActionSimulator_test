@@ -1,16 +1,13 @@
 import wx
 
 import as_test.core.macro_widget
-
-
+# ? change this to import as_test.core.macro_widget as macro_widgets ?
 
 
 class MainFrame(wx.Frame):
     def __init__(self):
         super().__init__(None, title="My wxPython App", size=(800, 600))
         self.main_panel = wx.Panel(self)
-
-
 
 
         ##########
@@ -24,14 +21,34 @@ class MainFrame(wx.Frame):
         # add widgets sequentially (fills Row 1: Col 1, Col 2, then Row 2: Col 1, Col 2...)
         # row 1, col 1 radiobutton collection in a vertical box sizer
         self.rb_sizer = wx.BoxSizer(wx.VERTICAL)
+        self.rb_group = []
         self.rb1 = wx.RadioButton(self.main_panel, -1, label="RB1 (Group 1)", style=wx.RB_GROUP)
         self.rb_sizer.Add(self.rb1, 0, wx.ALL, 5)
-        self.rb2 = wx.RadioButton(self.main_panel, -1, label="RB2 Group 1)")
+        self.rb2 = wx.RadioButton(self.main_panel, -1, label="RB2 (Group 1)")
         self.rb_sizer.Add(self.rb2, 0, wx.ALL, 5)
-        self.rb3 = wx.RadioButton(self.main_panel, -1, label="RB3 Group 1)")
+        self.rb3 = wx.RadioButton(self.main_panel, -1, label="RB3 (Group 1)")
         self.rb_sizer.Add(self.rb3, 0, wx.ALL, 5)
-        self.rb4 = wx.RadioButton(self.main_panel, -1, label="RB4 Group 1)")
+        self.rb4 = wx.RadioButton(self.main_panel, -1, label="RB4 (Group 1)")
         self.rb_sizer.Add(self.rb4, 0, wx.ALL, 5)
+        self.rb_group.append(self.rb1)
+        self.rb_group.append(self.rb2)
+        self.rb_group.append(self.rb3)
+        self.rb_group.append(self.rb4)
+        # the reason for this_rb=rb ?
+        # lambdas in loops capture the variable, not the value
+        # Defalute arguments capture the value, not the variable
+        # a python closure issue (feature)
+        # freeze the value with the this_rb=rb statment!
+        # clicking an already selected RB -> NO EVENT!
+        # so bind to a right click as well if the user clicks on a selected RB
+        for rb in self.rb_group:
+            self.Bind(wx.EVT_MOUSE_EVENTS,
+                      lambda evt, this_rb=rb: as_test.core.macro_widget.onRBselect(this_rb, evt),
+                      id=rb.GetId())
+            self.Bind(wx.EVT_RADIOBUTTON,
+                      lambda evt, this_rb=rb: as_test.core.macro_widget.onRBselect(this_rb, evt),
+                      id=rb.GetId())
+
         self.fgs_main.Add(self.rb_sizer, 1, wx.EXPAND)
 
         # row 1, col 2 checkboxes
@@ -44,6 +61,11 @@ class MainFrame(wx.Frame):
         self.ckbx_sizer.Add(self.ckb2, 0, wx.ALL, 5)
         self.ckbx_sizer.Add(self.ckb3, 0, wx.ALL, 5)
         self.ckbx_sizer.Add(self.ckb4, 0, wx.ALL, 5)
+        #bind all to same handler (see handler doc)
+        self.ckb1.Bind(wx.EVT_CHECKBOX, as_test.core.macro_widget.on_checkbox)
+        self.ckb2.Bind(wx.EVT_CHECKBOX, as_test.core.macro_widget.on_checkbox)
+        self.ckb3.Bind(wx.EVT_CHECKBOX, as_test.core.macro_widget.on_checkbox)
+        self.ckb4.Bind(wx.EVT_CHECKBOX, as_test.core.macro_widget.on_checkbox)
 
         self.fgs_main.Add(self.ckbx_sizer)
 
@@ -78,37 +100,49 @@ class MainFrame(wx.Frame):
         # add record/recording, playback buttons
         self.butn_sizer = wx.BoxSizer(wx.VERTICAL)
         self.record_btn = wx.Button(self.main_panel, -1, label="🔴 Record Macro")
-        self.record_btn.SetToolTip(
-            "Click this button and then type, click, mouse around\n"
-            "to record your macro. Then click here again when done.")
         # Bind the external handler use a lambda function to pass the widget to the external routine(s)
         # this passes both the widget and the event
         # linking the record and playback buttons so can pass both in the lambda function
-        self.record_btn.Bind(wx.EVT_BUTTON, lambda evt: as_test.core.macro_widget.on_record(self.record_btn, self.playback_btn, evt))
+        self.record_btn.Bind(wx.EVT_BUTTON,
+                             lambda evt: as_test.core.macro_widget.on_record(self.record_btn, self.playback_btn, evt))
+        self.record_btn.SetToolTip("Click this button or HotKey Alt+M to start / end macro recording")
         self.butn_sizer.Add(self.record_btn, 0, wx.ALL, 5)
+
         self.playback_btn = wx.Button(self.main_panel, -1, label="▶ Play Macro")
         self.playback_btn.SetToolTip("After recording click here to replay your macro")
+        self.playback_btn.Bind(wx.EVT_BUTTON,
+                             lambda evt: as_test.core.macro_widget.on_play(self.record_btn, self.playback_btn, evt))
         self.butn_sizer.Add(self.playback_btn, 0, wx.ALL, 5)
+
         self.fgs_main.Add(self.butn_sizer)
 
         # set flexgrid
         self.main_panel.SetSizer(self.fgs_main)
         self.main_panel.Layout()
 
+
         # ---------------------------------------------------
         # Build the accelerator table
+        # has to be below the GUI creation as that is what is referenced here
         # ---------------------------------------------------
         # create linking ID's for the wx.EVT_MENU to the accelerator in the table
         # here again using lambda functions to load the call to the handlers in macro_widget.py
         # this passes in the handler in macro_widget; the control and the evt as well
 
         ID_ALT_W =wx.NewIdRef()
+        ID_ALT_M = wx.NewIdRef()
 
         self.Bind(wx.EVT_MENU,
                   lambda evt: as_test.core.macro_widget.on_txtctrl_lost_focus(self.mult_line_tx, evt),
                   id=ID_ALT_W)
+        self.Bind(wx.EVT_MENU,
+                  lambda evt:  as_test.core.macro_widget.on_record(self.record_btn, self.playback_btn, evt),
+                  id=ID_ALT_M)
 
-        self.accel_table = wx.AcceleratorTable([(wx.ACCEL_ALT, ord('W'), ID_ALT_W),])
+        self.accel_table = wx.AcceleratorTable([(wx.ACCEL_ALT, ord('W'), ID_ALT_W),
+                                                (wx.ACCEL_ALT, ord('M'), ID_ALT_M),
+                                                ])
+
 
         self.SetAcceleratorTable(self.accel_table)
 
@@ -153,6 +187,13 @@ class MainFrame(wx.Frame):
         self.menu_bar.Append(self.macro_menu, "&Macro")
 
         self.SetMenuBar(self.menu_bar)
+
+    def FindWindowAtPointer(self, pos):
+        # ScreenToClient()
+        pos = self.ScreenToClient(pos)
+        child = self.main_panel.FindWindowByLabel('RB1 (Group 1)', main_panel)
+        return child
+
 
 
     # basic event handling;

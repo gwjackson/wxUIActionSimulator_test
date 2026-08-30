@@ -2,12 +2,17 @@ import wx
 import time
 import functools
 
-# module level state class
+# module level state class; an AI suggestion
 class _State:
     last_record_btn = None
     last_playback_btn = None
     last_event = None
     last_contest = None
+    last_macro_name = None
+
+    def __init__(self):
+        self.last_context = None
+        self.last_event = None
 
     def reset_state(self):
         state.last_record_btn = None
@@ -62,13 +67,13 @@ def on_play(record, play,  evt=None):
     state.last_record_btn = record
     macros = MacroManager()
 
-    if play.GetLabel() == "Play Macro":
-        play.SetLabel("Playing Macro")
+    if play.GetLabel() == "▶ Play Macro":
+        play.SetLabel("▶ Playing Macro")
         record.Disable()
         print("Playing Macro")
-        #macros.apply_macro(self.macro_name)
+        #macros.apply_macro(self.state.last_macro_name)
     else:
-        play.SetLabel("Play Macro")
+        play.SetLabel("▶ Play Macro")
         record.Enable()
         print("stop Playing Macro")
     return
@@ -88,12 +93,31 @@ def on_exit(self, evt):
     print(f"Exit menu selected Ctrl+Q")
     wx.GetApp().ExitMainLoop()
 
+# ------------------------------------------------
+# Widget selections
+# ________________________________________________
+
+def onRBselect(rb, evt):
+    rb_selected = evt.GetEventObject().GetLabel()
+    print("Selected RB:", rb_selected)
+
 def on_txtctrl_lost_focus( widget,evt=None):
     text = widget.GetValue()
     print("lost focus text is ->", text)
     # need the skip to allow the lost focus event to propagate normally
+    return text
     evt.Skip()
 
+# captures the 4 checkboxes and will use a dictionary dispatcher keyed on the label, not an if block
+def on_checkbox( evt):
+    ckbx = evt.GetEventObject()
+    ckbx_dispatch = {"CKB1": "you got ckbx_msg_1",
+                 "CKB2": "you got ckbx_msg_2",
+                 "CKB3": "you got ckbx_msg_3",
+                 "CKB4": "you got ckbx_msg_4"}
+    handler = ckbx_dispatch[ckbx.GetLabel()]
+    if handler:
+        print(f"Checkbox selected: {ckbx.GetValue()}, label is: {ckbx.GetLabel()} message: {ckbx_dispatch[ckbx.GetLabel()]}")
 
 # --------------------------------------------------
 # dialog call
@@ -178,14 +202,16 @@ class MacroManager:
     # --------------------------------
     # Recording control
     # --------------------------------
-    def start_recording(self):                       # toggle record macro / stop recording: to have to refractor this from above
-        self.macro_Name = "test_macro"               # need to get user input for macro name
+    def start_recording(self):                          # toggle record macro / stop recording: to have to refractor this from above
+        state.last_macro_name = "test_macro"            # need to get user input for macro name
         self.recording = True
         self.record_buffer.clear()
         print("Macro started recording")
         # add call macro recorder to actually get it started
 
-    def stop_recording(self, macro_name):
+    def stop_recording(self, macro_name=None):
+        if macro_name is None:
+            macro_name = state.last_macro_name
         self.recording = False
         self.user_macros[macro_name] = list(self.record_buffer)
         print("Macro stopper recording")
@@ -193,7 +219,7 @@ class MacroManager:
 
 
     # -----------------------------------------
-    #  Decorator
+    #  Decorator / AI assistance
     # -----------------------------------------
     """
     Every widget / hotkey etc. that you want to include in a macro has to 
@@ -231,13 +257,16 @@ class MacroManager:
     # Replay macro
     # ________________________________________
     def apply_macro(self, macro_name):
+        if macro_name is None:
+            macro_name = state.last_macro_name
         actions = self.user_macros.get(macro_name)
         if not actions:
             return
 
         cmd = CompositeMacroCommand(actions, label=f'Macro: {macro_name}')
         self.processor.Submit(cmd)
-        # call on_play to toggle off
+        # call on_play to toggle off - - on_play(record, play,  evt=None):
+        #on_play(state.last_record, state.last_play, state.last_evt)  < -- may not take the function
 
     # ---------------------------------------------
     # Undo / Redo  (not sure will be using but is part of Command / CommandProcessor
