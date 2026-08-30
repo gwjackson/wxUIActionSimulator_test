@@ -105,8 +105,8 @@ def on_txtctrl_lost_focus( widget,evt=None):
     text = widget.GetValue()
     print("lost focus text is ->", text)
     # need the skip to allow the lost focus event to propagate normally
-    return text
     evt.Skip()
+    return text
 
 # captures the 4 checkboxes and will use a dictionary dispatcher keyed on the label, not an if block
 def on_checkbox( evt):
@@ -116,8 +116,13 @@ def on_checkbox( evt):
                  "CKB3": "you got ckbx_msg_3",
                  "CKB4": "you got ckbx_msg_4"}
     handler = ckbx_dispatch[ckbx.GetLabel()]
-    if handler:
+    if handler:                                    # this is where the dispatch to the business would go
         print(f"Checkbox selected: {ckbx.GetValue()}, label is: {ckbx.GetLabel()} message: {ckbx_dispatch[ckbx.GetLabel()]}")
+
+def on_combobox1(evt):
+    print("combobox1 selected: ", evt.GetEventObject().GetValue())
+
+
 
 # --------------------------------------------------
 # dialog call
