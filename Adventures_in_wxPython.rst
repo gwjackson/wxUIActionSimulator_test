@@ -115,4 +115,7 @@ wxPython / GUI Gotchas
     - seems once a radio button is clicked even if you click it again, no event is trigger.  Seems all user type events are swallowed the the OS that supports the radio button. So no way when building a macro can you capture that the user clicked on it as part of there macro.
         - can seem to capture a mouse over window event for the radio button and all other windows / widgets, but not found a dependable way to get the under laying widget.
         - arggggggggggggggg
+        - going to checkout RadioBox ?  But it to seems to have the same issue as a RadioButton
+        - again - arggggggggggggggggggg
+
 
